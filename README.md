@@ -45,6 +45,9 @@ This project is an **asynchronous image processing system** built using FastAPI,
   "request_id": "unique-request-id"
 }
 ```
+ **Status Code:**
+- `202 Accepted` - Request accepted
+
 ### 2. **Check Processing Status**
 
 **Endpoint:**
@@ -65,9 +68,6 @@ Returns the current status of a request, including whether it is still processin
   "status": "in progress"
 }
 ```
- **Status Code:**
-- `202 Accepted` - Request accepted
-
 **Success Response (completed):**   
 
 ```json
