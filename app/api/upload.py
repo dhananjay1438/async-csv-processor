@@ -2,6 +2,8 @@ import uuid
 from typing import Dict
 
 from fastapi import APIRouter, UploadFile, File
+from starlette.status import HTTP_202_ACCEPTED
+
 from app.models.requests import UploadResponse
 from app.redis import update_task_status, get_task_status
 from app.services.csv_handler import process_csv
@@ -11,7 +13,7 @@ router = APIRouter()
 
 @router.post("/", summary="Use to upload CSV file to process it",
              description="Adds the request to upload CSV file and get the compressed images back",
-             response_model=UploadResponse)
+             response_model=UploadResponse, status_code=HTTP_202_ACCEPTED)
 async def upload_csv(file: UploadFile = File(...)) -> UploadResponse:
 
     file_content: bytes = await file.read()
