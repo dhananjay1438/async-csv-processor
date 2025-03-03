@@ -2,15 +2,12 @@ import asyncio
 import csv
 import os
 import uuid
-from http.client import responses
-from os import write
-from unicodedata import lookup
 
 from PIL import Image
 import requests
 import io
 from celery.utils.log import get_task_logger
-from typing import List, Dict, Any
+from typing import List
 
 from msgpack.fallback import BytesIO
 
