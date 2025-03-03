@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from app.api import upload
 from fastapi import FastAPI
 
