@@ -104,3 +104,8 @@ Triggers a webhook notification when image processing is completed. The webhook 
   "csv_url": "https://firestore-storage-link/output.csv"
 }
 ```
+ **Status Codes:**
+- `200 OK` - Successful response with the current processing status.
+- `400 Bad Request` - Invalid request parameters or missing request ID.
+- `500 Internal Server Error` - Server encountered an error while processing the request.
+
