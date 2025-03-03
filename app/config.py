@@ -1,12 +1,14 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
 
-environment = os.getenv('ENVIRONMENT')
-env_file = '.env.local' if environment == 'local' else '.env.docker'
+if not os.environ.get('RENDER'):
+    load_dotenv()
 
-load_dotenv(env_file)
+    environment = os.getenv('ENVIRONMENT')
+    env_file = '.env.local' if environment == 'local' else '.env.docker'
+
+    load_dotenv(env_file)
 
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = os.getenv('REDIS_PORT', 6379)
