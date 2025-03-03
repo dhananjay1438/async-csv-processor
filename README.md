@@ -109,3 +109,39 @@ Triggers a webhook notification when image processing is completed. The webhook 
 - `400 Bad Request` - Invalid request parameters or missing request ID.
 - `500 Internal Server Error` - Server encountered an error while processing the request.
 
+## **Asynchronous Workers Documentation**
+
+This system uses **Celery workers** to handle image processing asynchronously. The workers validate the CSV data, process images, store them in Firestore, generate a new CSV, and trigger a webhook upon completion.
+
+---
+
+### **Worker Functions Overview**
+
+#### **1. CSV Processing Worker**
+##### **Function:** `process_csv(file_content: str, request_id: str)`
+
+- **Purpose:** Validates the uploaded CSV file, extracts product details, and queues image processing tasks.
+- **Steps:**
+  1. Reads and validates the CSV content.
+  2. Checks for duplicate serial numbers.
+  3. Stores valid rows and logs any errors.
+  4. Updates the task status in Redis.
+  5. If successful, triggers the `process_images` task.
+
+---
+
+#### **2. Image Processing Worker**
+##### **Function:** `process_images(validated_rows: List[dict], request_id: str)`
+
+- **Purpose:** Downloads images, compresses them to 50% quality, and stores them in Firestore.
+- **Steps:**
+  1. Iterates through the validated rows from the CSV.
+  2. Downloads each input image.
+  3. Compresses the image using **PIL (Pillow)**.
+  4. Saves the image to Firestore storage.
+  5. Stores processed image URLs in Firestore.
+  6. Generates an output CSV with processed image links.
+  7. Updates task status to `completed` and stores the output CSV URL.
+  8. Calls the `trigger_webhook` function.
+
+---
