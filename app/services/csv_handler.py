@@ -1,4 +1,6 @@
+import asyncio
 import csv
+import os
 import uuid
 from http.client import responses
 from os import write
@@ -104,7 +106,8 @@ def process_images(validated_rows: List[dict], request_id: str) -> None:
                     'output_urls': ','.join(output_urls)
                 })
 
-        csv_url = generate_and_upload_csv(output_image_urls, request_id)
+        loop = asyncio.get_event_loop()
+        csv_url = loop.run_until_complete(generate_and_upload_csv(output_image_urls, request_id))
 
         update_task_status(request_id, 'status', 'completed')
         update_task_status(request_id, 'csv_url', csv_url)
@@ -116,7 +119,7 @@ def process_images(validated_rows: List[dict], request_id: str) -> None:
         update_task_status(request_id, 'status', 'failed')
 
 
-def generate_and_upload_csv(data: List[dict], request_id: str) -> str:
+async def generate_and_upload_csv(data: List[dict], request_id: str) -> str:
 
     file_name = f'processed_results_{request_id}.csv'
     file_path = f'/tmp/{file_name}'
@@ -129,8 +132,11 @@ def generate_and_upload_csv(data: List[dict], request_id: str) -> str:
             writer.writerow([row['serial_number'], row['product_name'], row['input_urls'], row['output_urls']])
 
     blob = bucket.blob(f'processed_csvs/{file_name}')
-    blob.upload_from_filename(file_path, content_type='text/csv')
+    await asyncio.to_thread(blob.upload_from_filename, file_path, content_type='text/csv')
+
     blob.make_public()
+
+    os.remove(file_path)
 
     return blob.public_url
 
